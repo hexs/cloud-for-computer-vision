@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Config</title>
+    <script>
+        function validateForm() {
+            var ipv4 = document.forms["inputForm"]["ipv4"].value;
+            var port = document.forms["inputForm"]["port"].value;
+            if (ipv4 == "" || port == "" || !isValidIPv4(ipv4) || !isValidPort(port)) {
+                alert("Both input fields must be filled out with valid formats");
+                return false;
+            }
+            return true;
+        }
+
+        function isValidIPv4(ip) {
+            var ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
+            if (!ipPattern.test(ip)) return false;
+            var parts = ip.split('.');
+            return parts.every(part => parseInt(part) >= 0 && parseInt(part) <= 255);
+        }
+
+        function isValidPort(port) {
+            var portPattern = /^\d+$/;
+            var portNum = parseInt(port);
+            return portPattern.test(port) && portNum >= 0 && portNum <= 65535;
+        }
+
+        function updateURL() {
+            var ipv4 = document.getElementById("ipv4").value;
+            var port = document.getElementById("port").value;
+            var other = document.getElementById("other").value;
+            var url = "http://" + ipv4 + ":" + port + "/" + other;
+            document.getElementById("urlDisplay").textContent = url;
+
+            // Validate and show/hide error messages
+            document.getElementById("ipv4Error").style.display = isValidIPv4(ipv4) ? "none" : "inline";
+            document.getElementById("portError").style.display = isValidPort(port) ? "none" : "inline";
+        }
+
+        window.onload = function() {
+            updateURL();
+        }
+    </script>
+</head>
+<body>
+    <h1>Set Config</h1>
+    <form name="inputForm" method="POST" onsubmit="return validateForm()">
+        <input type="text" id="ipv4" name="ipv4" placeholder="{{ default_ipv4 }}" oninput="updateURL()">
+        <label id="ipv4Error" style="color: red; display: none;">Format is invalid</label><br>
+
+        <input type="text" id="port" name="port" placeholder="{{ default_port }}" oninput="updateURL()">
+        <label id="portError" style="color: red; display: none;">Format is invalid</label><br>
+
+        <input type="text" id="other" name="other" value="image?source=video_capture&id=0" oninput="updateURL()"><br>
+
+        <br>
+        <label>URL: <span id="urlDisplay">http://:/image</span></label><br>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
