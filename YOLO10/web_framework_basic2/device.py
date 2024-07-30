@@ -6,17 +6,29 @@ import numpy as np
 import requests
 
 
-def video_capture():
+def YOLO_oncloud(ipv4_server, port_server, url_image):
+    # send url_image to server
+    try:
+        requests.post(f'http://{ipv4_server}:{port_server}/config',
+                      data={
+                          'ipv4': '192.168.225.137',
+                          'port': '2000',
+                          'other': 'image?source=video_capture&id=0'
+                      })
+        play = True
+    except Exception as e:
+        print(e)
+        print(f"Unable to connect to http://{ipv4_server}:{port_server}")
+        play = False
 
-    url = f"http://192.168.225.137:1000/get-detections"
-    while True:
+    while play:
         t1 = datetime.now()
 
-        req = urllib.request.urlopen('http://192.168.225.137:2000/image?source=video_capture&id=0')
+        req = urllib.request.urlopen(url_image)
         arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
         frame = cv2.imdecode(arr, -1)
 
-        response = requests.get(url)
+        response = requests.get(f"http://{ipv4_server}:{port_server}/get-detections")
         if response.status_code == 200:
             detections = json.loads(response.text)
             for det in detections:
@@ -35,7 +47,9 @@ def video_capture():
             break
 
 
-
-
 if __name__ == "__main__":
-    video_capture()
+    ipv4_server = '192.168.225.137'
+    port_server = '1000'
+    url_image = 'http://192.168.225.137:2000/image?source=video_capture&id=0'
+
+    YOLO_oncloud(ipv4_server, port_server, url_image)

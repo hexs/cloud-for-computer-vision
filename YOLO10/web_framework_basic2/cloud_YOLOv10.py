@@ -44,6 +44,7 @@ app = Flask(__name__)
 def hello_world():
     return (
         "<a href='/config'>config</a><br>"
+        "<a href='/reset'>reset</a><br>"
         "<a href='/get-detections'>get-detections</a><br>"
     )
 
@@ -64,6 +65,16 @@ def config():
     ipv4 = parsed_url.hostname
     port = parsed_url.port
     return render_template('config.html', default_ipv4=ipv4, default_port=port)
+
+
+@app.route("/reset")
+def reset():
+    app.config['data']['url_image'] = None
+    return (
+        "<a href='/config'>config</a><br>"
+        "<a href='/reset'>reset</a><br>"
+        "<a href='/get-detections'>get-detections</a><br>"
+    )
 
 
 @app.route("/get-detections")
